@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NGNEON">
+  <defs>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4defff"/>
+      <stop offset="0.55" stop-color="#00d9ff"/>
+      <stop offset="1" stop-color="#ff3df2"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#050710"/>
+  <path d="M12 52 18 12h11l10 23 3-23h10l-6 40H35L25 28l-3 24H12Z" fill="url(#g)" filter="url(#glow)"/>
+  <path d="M12 52 18 12h11l10 23 3-23h10l-6 40H35L25 28l-3 24H12Z" fill="none" stroke="#eef8ff" stroke-opacity=".38"/>
+</svg>

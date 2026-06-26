@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Guía completa de NGNEON-EMU: emulador Neo Geo en Rust con soporte .neo, .zip, BIOS, controles, RetroAchievements y configurador web."
+    />
+    <title>NGNEON-EMU · Guía completa</title>
+    <link rel="icon" href="./assets/ngneon-favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <header class="site-header" id="top">
+      <a class="brand" href="#top" aria-label="Ir al inicio">
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>NGNEON</strong>
+          <small>Neo Geo System</small>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="#inicio">Inicio</a>
+        <a href="#instalacion">Instalación</a>
+        <a href="#uso">Uso</a>
+        <a href="#controles">Controles</a>
+        <a href="#configurador">Configurador</a>
+        <a href="#retroachievements">RetroAchievements</a>
+        <a href="#capturas">Capturas</a>
+      </nav>
+      <a class="header-cta" href="https://github.com/DOCK-PI3/NGNEON-EMU" target="_blank" rel="noreferrer">GitHub</a>
+    </header>
+
+    <main>
+      <section class="hero section" id="inicio">
+        <div class="hero-copy">
+          <p class="terminal-line">C:\NGNEON&gt; boot --neo-geo --neon</p>
+          <h1>NGNEON-EMU</h1>
+          <p class="lead">
+            Emulador Neo Geo nativo en Rust con frontend SDL2/OpenGL, efectos CRT,
+            soporte de ROMs <code>.neo</code> y <code>.zip</code>, audio sincronizado,
+            controles configurables y RetroAchievements.
+          </p>
+          <div class="hero-actions">
+            <a
+              class="button primary"
+              href="https://github.com/DOCK-PI3/NGNEON-EMU/releases/download/v1.2.3/NGNEON-EMU.zip"
+              target="_blank"
+              rel="noreferrer"
+            >Descargar Windows v1.2.3</a>
+            <a class="button ghost" href="#instalacion">Empezar guía</a>
+            <a
+              class="button ghost"
+              href="https://github.com/DOCK-PI3/NGNEON-EMU/blob/main/CHANGELOG.md"
+              target="_blank"
+              rel="noreferrer"
+            >Ver changelog</a>
+          </div>
+          <div class="status-strip" aria-label="Estado del proyecto">
+            <span><b>160/160</b> ZIP runtime OK</span>
+            <span><b>.neo</b> estable</span>
+            <span><b>OpenGL</b> CRT shader</span>
+            <span><b>RA</b> rcheevos</span>
+          </div>
+        </div>
+
+        <div class="hero-rig" aria-label="Vista previa del emulador">
+          <div class="holo-frame">
+            <div class="frame-top">
+              <span></span><span></span><span></span>
+              <small>NGNEON VIDEO BUS</small>
+            </div>
+            <img src="./assets/screenshots/svc.png" alt="Captura de NGNEON-EMU ejecutando un juego" />
+            <div class="frame-hud">
+              <span>304×224 visible</span>
+              <span>59.185606 Hz MVS</span>
+              <span>Audio lock</span>
+            </div>
+          </div>
+          <div class="floating-card card-a">
+            <strong>ZIP Loader</strong>
+            <span>FBNeo/MAME layout parity</span>
+          </div>
+          <div class="floating-card card-b">
+            <strong>RetroAchievements</strong>
+            <span>Token + Hardcore mode</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section metrics" aria-label="Resumen técnico">
+        <article>
+          <span class="metric-value">160</span>
+          <span class="metric-label">ROMs ZIP auditadas</span>
+        </article>
+        <article>
+          <span class="metric-value">88</span>
+          <span class="metric-label">tests ROM loader</span>
+        </article>
+        <article>
+          <span class="metric-value">0</span>
+          <span class="metric-label">runtime review/fail</span>
+        </article>
+        <article>
+          <span class="metric-value">4:3</span>
+          <span class="metric-label">salida Neo Geo original</span>
+        </article>
+      </section>
+
+      <section class="section split" id="que-es">
+        <div>
+          <h2>Qué es NGNEON-EMU</h2>
+          <p>
+            NGNEON-EMU es un emulador Neo Geo multiplataforma escrito en Rust. El núcleo
+            mantiene la emulación desacoplada de la interfaz, y el frontend usa SDL2 +
+            OpenGL para ofrecer baja latencia, efectos CRT y overlays nativos.
+          </p>
+          <p>
+            La filosofía del proyecto es clara: comportamiento verificable, comparación
+            con referencias como Geolith/FBNeo y pruebas reales sobre la biblioteca local
+            antes de dar una compatibilidad por buena.
+          </p>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <h3>Núcleo Rust</h3>
+            <p>CPU 68000, Z80, memoria, LSPC, YM2610, save states y protecciones de cartucho.</p>
+          </article>
+          <article>
+            <h3>Frontend nativo</h3>
+            <p>SDL2 + OpenGL 3.3, overlays, selector BIOS, navegador ROM y configuración.</p>
+          </article>
+          <article>
+            <h3>Web configurator</h3>
+            <p>Launcher local con media, gamelist.xml, favoritos, recientes y panel RA.</p>
+          </article>
+          <article>
+            <h3>Auditorías</h3>
+            <p>Herramientas para probar carga, vídeo, audio, cadencia y arranque de ROMs.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="instalacion">
+        <div class="section-heading">
+          <span class="section-index">01</span>
+          <div>
+            <h2>Instalación y compilación</h2>
+            <p>Guía base para Windows. También sirve como referencia para otros sistemas con Rust, SDL2 y OpenGL.</p>
+          </div>
+        </div>
+
+        <div class="download-banner">
+          <div>
+            <span class="eyebrow">Release oficial</span>
+            <h3>Windows listo para jugar</h3>
+            <p>
+              Si no quieres compilar, descarga el paquete publicado en GitHub Releases.
+              De momento la build precompilada disponible es para Windows.
+            </p>
+          </div>
+          <div class="download-actions">
+            <a
+              class="button primary"
+              href="https://github.com/DOCK-PI3/NGNEON-EMU/releases/download/v1.2.3/NGNEON-EMU.zip"
+              target="_blank"
+              rel="noreferrer"
+            >Descargar NGNEON-EMU.zip</a>
+            <a
+              class="button ghost"
+              href="https://github.com/DOCK-PI3/NGNEON-EMU/releases"
+              target="_blank"
+              rel="noreferrer"
+            >Ver releases</a>
+          </div>
+        </div>
+
+        <div class="steps">
+          <article class="step">
+            <span>1</span>
+            <div>
+              <h3>Instala Rust</h3>
+              <p>Necesitas una toolchain Rust estable. En Windows se recomienda instalar Rust con rustup.</p>
+              <pre><code>rustup update</code></pre>
+            </div>
+          </article>
+          <article class="step">
+            <span>2</span>
+            <div>
+              <h3>Compila el workspace</h3>
+              <p>Desde la raíz del proyecto:</p>
+              <pre><code>cargo build --release --workspace</code></pre>
+            </div>
+          </article>
+          <article class="step">
+            <span>3</span>
+            <div>
+              <h3>Coloca BIOS y ROMs</h3>
+              <p>
+                Crea o usa las carpetas <code>bios/</code>, <code>roms/</code> y
+                <code>roms_zip/</code>. El emulador no incluye BIOS ni juegos.
+              </p>
+              <pre><code>bios/neogeo.zip
+roms/aof.neo
+roms_zip/mslug.zip</code></pre>
+            </div>
+          </article>
+          <article class="step">
+            <span>4</span>
+            <div>
+              <h3>Ejecuta</h3>
+              <p>Puedes abrir una ROM directamente o arrancar la demo interna.</p>
+              <pre><code>target\release\ngneon-emu.exe --demo
+target\release\ngneon-emu.exe roms\aof.neo
+target\release\ngneon-emu.exe roms_zip\mslug.zip</code></pre>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section command-center" id="uso">
+        <div class="section-heading">
+          <span class="section-index">02</span>
+          <div>
+            <h2>Uso diario</h2>
+            <p>Flujo recomendado para jugar, configurar, probar y mantener tu biblioteca.</p>
+          </div>
+        </div>
+
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="Guías de uso">
+            <button class="tab active" data-tab="roms" type="button">ROMs</button>
+            <button class="tab" data-tab="bios" type="button">BIOS</button>
+            <button class="tab" data-tab="video" type="button">Vídeo</button>
+            <button class="tab" data-tab="audio" type="button">Audio</button>
+            <button class="tab" data-tab="saves" type="button">Saves</button>
+          </div>
+          <div class="tab-panels">
+            <article class="tab-panel active" data-panel="roms">
+              <h3>ROMs .neo y .zip</h3>
+              <p>
+                Usa <code>.neo</code> para paquetes estilo NeoSD/TerraOnion y
+                <code>.zip</code> para sets compatibles con estructura FBNeo/MAME.
+              </p>
+              <pre><code>target\release\ngneon-emu.exe roms\garou.neo
+target\release\ngneon-emu.exe roms_zip\garou.zip</code></pre>
+              <p>
+                Desde el emulador abre el navegador con <kbd>Ctrl</kbd> + <kbd>O</kbd>.
+              </p>
+            </article>
+            <article class="tab-panel" data-panel="bios">
+              <h3>BIOS</h3>
+              <p>
+                Coloca <code>neogeo.zip</code> o <code>aes.zip</code> en <code>bios/</code>.
+                El selector se abre con <kbd>Ctrl</kbd> + <kbd>B</kbd>.
+              </p>
+              <pre><code>[INFO] BIOS activa: neogeo.zip:sp-s2.sp1
+[INFO] Tabla L0 activa: neogeo.zip:000-lo.lo
+[INFO] SFIX activa: neogeo.zip:sfix.sfix</code></pre>
+            </article>
+            <article class="tab-panel" data-panel="video">
+              <h3>Vídeo</h3>
+              <p>
+                Activa scanlines, curvatura y bloom desde teclado o desde el menú
+                <kbd>Ctrl</kbd> + <kbd>S</kbd>. Mantén 4:3 si quieres aspecto original.
+              </p>
+              <ul>
+                <li><kbd>F2</kbd>: scanlines</li>
+                <li><kbd>F3</kbd>: curvatura CRT</li>
+                <li><kbd>F4</kbd>: bloom</li>
+                <li><kbd>F11</kbd>: pantalla completa</li>
+              </ul>
+            </article>
+            <article class="tab-panel" data-panel="audio">
+              <h3>Audio sincronizado</h3>
+              <p>
+                El frontend conserva el resto fraccional de samples por frame para evitar drift.
+                El volumen se controla desde el menú o con atajos.
+              </p>
+              <ul>
+                <li><kbd>Ctrl</kbd> + <kbd>M</kbd>: mute</li>
+                <li><kbd>Ctrl</kbd> + <kbd>=</kbd>: subir volumen</li>
+                <li><kbd>Ctrl</kbd> + <kbd>-</kbd>: bajar volumen</li>
+              </ul>
+            </article>
+            <article class="tab-panel" data-panel="saves">
+              <h3>Save states</h3>
+              <p>Hay 10 slots por ROM, miniaturas y auto-save opcional.</p>
+              <ul>
+                <li><kbd>F9</kbd>: guardar estado</li>
+                <li><kbd>F10</kbd>: cargar estado</li>
+                <li><kbd>F7</kbd> / <kbd>Shift</kbd> + <kbd>F7</kbd>: cambiar slot</li>
+                <li><kbd>Ctrl</kbd> + <kbd>F12</kbd>: gestor de save states</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="controles">
+        <div class="section-heading">
+          <span class="section-index">03</span>
+          <div>
+            <h2>Controles principales</h2>
+            <p>Atajos esenciales para jugar, depurar y configurar sin salir del emulador.</p>
+          </div>
+        </div>
+
+        <div class="controls-grid">
+          <article>
+            <h3>Juego</h3>
+            <dl>
+              <dt>Flechas</dt><dd>Direcciones jugador 1</dd>
+              <dt>Z / X / C / V</dt><dd>Botones A / B / C / D</dd>
+              <dt>Enter</dt><dd>Start</dd>
+              <dt>Space</dt><dd>Coin</dd>
+            </dl>
+          </article>
+          <article>
+            <h3>Sistema</h3>
+            <dl>
+              <dt>Esc</dt><dd>Salir o cerrar overlay</dd>
+              <dt>F1</dt><dd>Cargar ROM</dd>
+              <dt>F5</dt><dd>Demo interna</dd>
+              <dt>F8</dt><dd>Reset CPU</dd>
+            </dl>
+          </article>
+          <article>
+            <h3>Overlays</h3>
+            <dl>
+              <dt>Ctrl+O</dt><dd>ROM Browser</dd>
+              <dt>Ctrl+S</dt><dd>Settings</dd>
+              <dt>Ctrl+B</dt><dd>BIOS Selector</dd>
+              <dt>Ctrl+G</dt><dd>Gamepad Config</dd>
+            </dl>
+          </article>
+          <article>
+            <h3>Diagnóstico</h3>
+            <dl>
+              <dt>F6</dt><dd>Debug overlay</dd>
+              <dt>F12</dt><dd>Screenshot BMP</dd>
+              <dt>--no-dump-rom-banks</dt><dd>Desactivar dumps ROM</dd>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split reverse" id="configurador">
+        <div class="mock-browser">
+          <div class="browser-bar">
+            <span></span><span></span><span></span>
+            <code>127.0.0.1:4177</code>
+          </div>
+          <div class="browser-content has-shot">
+            <img
+              src="./assets/screenshots/configurator-library.png"
+              alt="Configurador web NGNEON mostrando la biblioteca con vídeo, media y carrusel de juegos"
+            />
+          </div>
+        </div>
+        <div>
+          <h2>Configurador web local</h2>
+          <p>
+            NGNEON incluye un launcher web local para navegar la biblioteca con media,
+            lanzar juegos y consultar RetroAchievements sin exponer secretos al navegador.
+          </p>
+          <pre><code>cd configurator
+corepack pnpm install
+corepack pnpm build
+corepack pnpm start</code></pre>
+          <p>Después abre:</p>
+          <pre><code>http://127.0.0.1:4177</code></pre>
+          <ul class="neon-list">
+            <li>Lee <code>roms/gamelist.xml</code>.</li>
+            <li>Usa vídeos, fanart, capturas, cajas 3D, cartuchos y manuales.</li>
+            <li>Soporta favoritos, recientes y búsqueda.</li>
+            <li>Puede mostrar perfil, últimos juegos y logros de RetroAchievements.</li>
+          </ul>
+        </div>
+        <div class="config-shot-grid" aria-label="Capturas del configurador web">
+          <figure>
+            <img
+              src="./assets/screenshots/configurator-retroachievements.png"
+              alt="Pantalla RetroAchievements del configurador web con perfil, puntos y últimos juegos"
+            />
+            <figcaption>RetroAchievements integrado: perfil, puntos, rango y juegos recientes.</figcaption>
+          </figure>
+          <figure>
+            <img
+              src="./assets/screenshots/configurator-settings.png"
+              alt="Ajustes del configurador web con opciones de vídeo, sistema y biblioteca"
+            />
+            <figcaption>Ajustes visuales, biblioteca, rutas y opciones del launcher local.</figcaption>
+          </figure>
+          <figure>
+            <img
+              src="./assets/screenshots/configurator-api-settings.png"
+              alt="Ajustes de API y RetroAchievements dentro del configurador web"
+            />
+            <figcaption>API key web protegida y configuración RA desde una interfaz cómoda.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="menu-interno">
+        <div class="section-heading">
+          <span class="section-index">04</span>
+          <div>
+            <h2>Menú interno del emulador</h2>
+            <p>El overlay nativo permite ajustar vídeo, audio, sistema, controles, rutas y RetroAchievements sin salir del juego.</p>
+          </div>
+        </div>
+        <div class="wide-gallery settings-gallery">
+          <figure>
+            <img src="./assets/screenshots/emulator-settings-video.png" alt="Menú de configuración de vídeo del emulador" />
+            <figcaption>Vídeo: scanlines, curvatura CRT, bloom, fullscreen, aspecto y escala.</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-settings-audio.png" alt="Menú de configuración de audio del emulador" />
+            <figcaption>Audio: volumen y silencio con ajuste directo desde el overlay.</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-settings-system.png" alt="Menú de configuración de sistema del emulador" />
+            <figcaption>Sistema: idioma, volcados, auto-save y selector de BIOS.</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-settings-controls.png" alt="Menú de configuración de controles del emulador" />
+            <figcaption>Controles: gamepad SDL2, configuración de mando y teclado.</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-settings-paths.png" alt="Menú de rutas del emulador" />
+            <figcaption>Rutas: ROMs, BIOS, screenshots y saves siempre visibles.</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-settings-ra.png" alt="Menú RetroAchievements del emulador" />
+            <figcaption>RetroAchievements: sesión, puntos, progreso, hardcore y últimos logros.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="retroachievements">
+        <div class="section-heading">
+          <span class="section-index">05</span>
+          <div>
+            <h2>RetroAchievements</h2>
+            <p>Integración con rcheevos para login, hardcore mode y estado de logros.</p>
+          </div>
+        </div>
+        <div class="ra-panel">
+          <div>
+            <h3>Config en <code>config/ngneon.conf</code></h3>
+            <pre><code>ra_token=
+ra_username=
+ra_password=
+ra_hardcore=off</code></pre>
+            <p>
+              Si hay <code>ra_token</code>, se usa antes que usuario/contraseña.
+              Para el configurador web, la API key se guarda y no se devuelve al cliente.
+            </p>
+          </div>
+          <div class="ra-card">
+            <span class="pulse"></span>
+            <strong>Panel RA</strong>
+            <p>Perfil, puntos, rango, juegos recientes, progreso y últimos logros.</p>
+            <div class="mini-stats">
+              <span>Hardcore</span>
+              <span>Login automático</span>
+              <span>Notificaciones</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="compatibilidad">
+        <div class="section-heading">
+          <span class="section-index">06</span>
+          <div>
+            <h2>Compatibilidad y auditoría</h2>
+            <p>NGNEON no se queda en “carga el archivo”: audita arranque, vídeo, audio y cadencia.</p>
+          </div>
+        </div>
+        <div class="audit-card">
+          <div>
+            <h3>Resultado ZIP final</h3>
+            <p>Auditoría runtime sobre la biblioteca local:</p>
+            <pre><code>[SUMMARY] total=160 loaded=160 load_failed=0 runtime_passed=160 runtime_review=0 runtime_failed=0 max_frames=1200</code></pre>
+          </div>
+          <div>
+            <h3>Comandos útiles</h3>
+            <pre><code>cargo test -p core-emulator rom::tests:: -- --test-threads=1
+cargo run --release -p core-emulator --bin audit_zip_library -- roms_zip
+cargo run --release -p core-emulator --bin audit_neo_library -- roms_zip 1200</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="capturas">
+        <div class="section-heading">
+          <span class="section-index">07</span>
+          <div>
+            <h2>Capturas</h2>
+            <p>Capturas directas del framebuffer mostrando ROMs cargadas y renderizando en NGNEON-EMU.</p>
+          </div>
+        </div>
+        <div class="gallery">
+          <figure>
+            <img src="./assets/screenshots/emulator-aof-loaded.png" alt="Art of Fighting cargado y renderizando en NGNEON-EMU" />
+            <figcaption>Art of Fighting · ROM cargada con sprites y HUD visibles</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-fatfury2-loaded.png" alt="Fatal Fury 2 cargado en NGNEON-EMU" />
+            <figcaption>Fatal Fury 2 · pantalla de título renderizada</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-s1945p-loaded.png" alt="Strikers 1945 Plus cargado en NGNEON-EMU" />
+            <figcaption>Strikers 1945 Plus · ZIP cifrado arrancando correctamente</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-preisle2-loaded.png" alt="Prehistoric Isle 2 cargado en NGNEON-EMU" />
+            <figcaption>Prehistoric Isle 2 · attract mode con escena visible</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-diggerma-loaded.png" alt="Diggerman cargado en NGNEON-EMU" />
+            <figcaption>Diggerman · pantalla de instrucciones renderizada</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/screenshots/emulator-shinobi-loaded.png" alt="Shinobi homebrew cargado en NGNEON-EMU" />
+            <figcaption>Shinobi homebrew · ROM no oficial cargando en NGNEON</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="estructura">
+        <div class="section-heading">
+          <span class="section-index">08</span>
+          <div>
+            <h2>Estructura del proyecto</h2>
+            <p>Mapa rápido de carpetas para quien clone el repositorio.</p>
+          </div>
+        </div>
+        <div class="tree-card">
+          <pre><code>NeoGeo_NeonEmu/
+├─ core-emulator/      Núcleo Neo Geo en Rust
+├─ frontend/           SDL2 + OpenGL + overlays
+├─ configurator/       Launcher web local
+├─ bios/               BIOS aportadas por el usuario
+├─ roms/               ROMs .neo
+├─ roms_zip/           ROMs .zip
+├─ config/             Configuración persistente
+├─ saves/              Save states
+├─ screenshots/        Capturas, WAVs y dumps diagnóstico
+└─ webhub/             Esta web para GitHub Pages</code></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>NGNEON-EMU</strong>
+        <p>Emulación Neo Geo en Rust, con alma de recreativa y neón en las venas.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/DOCK-PI3/NGNEON-EMU" target="_blank" rel="noreferrer">Repositorio</a>
+        <a
+          href="https://github.com/DOCK-PI3/NGNEON-EMU/releases/download/v1.2.3/NGNEON-EMU.zip"
+          target="_blank"
+          rel="noreferrer"
+        >Descargar Windows</a>
+        <a href="#top">Volver arriba ↑</a>
+      </div>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
